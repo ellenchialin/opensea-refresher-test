@@ -1,13 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import styles from '../styles/Home.module.css'
 
-function ScrollToBottom() {
-  const elementRef = useRef()
-  useEffect(() => elementRef.current.scrollIntoView())
-
-  return <div ref={elementRef} />
-}
-
 export default function Home() {
   const [contractAddress, setContractAddress] = useState('')
   const [isERC, setIsERC] = useState('yes')
