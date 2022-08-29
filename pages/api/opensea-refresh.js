@@ -1,4 +1,4 @@
-const puppeteer = require('puppeteer')
+const puppeteer = require('puppeteer-core')
 const chrome = require('chrome-aws-lambda')
 
 function pause(ms) {
@@ -18,31 +18,35 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'POST') {
-      const browser = await puppeteer.launch({
-        args: chrome.args,
+      const browser = await chrome.puppeteer.launch({
+        args: [...chrome.args, '--hide-scrollbars', '--disable-web-security'],
         executablePath: await chrome.executablePath,
-        headless: chrome.headless,
+        headless: true,
         ignoreHTTPSErrors: true,
         ignoreDefaultArgs: ['--disable-extensions']
       })
 
       console.log('Launching new page...')
       const page = await browser.newPage()
+      page.setUserAgent(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36'
+      )
 
       console.log('Going to Opensea...')
       await page.goto(
         `https://testnets.opensea.io/assets/rinkeby/${contractAddress}/${tokenId}`
       )
 
-      console.log('Wait 1 sec...')
+      // console.log('Wait 1 sec...')
       await pause(1000)
       // // await page.waitForSelector('[value="refresh"]')
 
       await page.click('[value="refresh"]')
-      console.log('Clicked refresh')
+      // console.log('Clicked refresh')
 
       // console.log('Taking screenshot...')
       // await page.screenshot({ path: 'example.png' })
+      // await page.screenshot({ type: 'png' })
 
       console.log(`Token ${tokenId} finished and ready to close browser...`)
       browser.close()
